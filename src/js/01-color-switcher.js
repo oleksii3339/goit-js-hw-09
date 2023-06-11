@@ -1,6 +1,6 @@
 const bodyEl = document.body;
-const btnStartEl = document.querySelector([data-start]);
-const btnStopEl = document.querySelector([data-stop]);
+const btnStartEl = document.querySelector('[data-start]');
+const btnStopEl = document.querySelector('[data-stop]');
 
 let interval = null;
 
