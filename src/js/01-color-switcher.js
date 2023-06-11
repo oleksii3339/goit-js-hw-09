@@ -8,7 +8,7 @@ function colorChange() {
     interval = setInterval(() => {
         bodyEl.style.backgroundColor = getRandomHexColor();
     }, 1000);
-    btnStartEl.disabled = true;
+    btnStartEl.disabled = true; 
 }
 
 
@@ -17,3 +17,9 @@ function getRandomHexColor() {
     .toString(16)
     .padStart(6, 0)}`;
 }
+
+btnStartEl.addEventListener('click', colorChange);
+btnStopEl.addEventListener('click', () => {
+    clearInterval(interval);
+    btnStartEl.disabled = false;
+})
