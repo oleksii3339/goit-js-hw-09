@@ -2,7 +2,6 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
-
 const btnStart = document.querySelector('[data-start]');
 const inputEl = document.querySelector('#datetime-picker');
 const outDays = document.querySelector('[data-days]');
@@ -11,6 +10,7 @@ const outMinutes = document.querySelector('[data-minutes]');
 const outSeconds = document.querySelector('[data-seconds]');
 
 btnStart.disabled = true;
+inputEl.disabled = false;
 
 const options = {
   enableTime: true,
@@ -49,16 +49,47 @@ function convertMs(ms) {
   return { days, hours, minutes, seconds };
 }
 
-function showTimer() {
-  const restOfTime = convertMs(
-    Date.parse(inputEl.value) - new Date().getTime()
-  );
-  const { days, hours, minutes, seconds } = restOfTime;
-  outDays.textContent = addLeadingZero(days);
-  outHours.textContent = addLeadingZero(hours);
-  outMinutes.textContent = addLeadingZero(minutes);
-  outSeconds.textContent = addLeadingZero(seconds);
+let countdownInterval;
+
+function startCountdown() {
+  btnStart.disabled = true;
+  inputEl.disabled = true;
+  clearInterval(countdownInterval);
+
+  const targetDate = Date.parse(inputEl.value);
+
+  countdownInterval = setInterval(() => {
+    const currentTime = new Date().getTime();
+    if (currentTime >= targetDate) {
+      clearInterval(countdownInterval);
+      showTimer();
+    } else {
+      showTimer();
+    }
+  }, 1000);
 }
 
-flatpickr(inputEl, options);
-btnStart.addEventListener('click', () => setInterval(showTimer, 1000));
+function showTimer() {
+  const currentTime = new Date().getTime();
+  const targetDate = Date.parse(inputEl.value);
+
+  if (currentTime >= targetDate) {
+    btnStart.disabled = false;
+    inputEl.disabled = false;
+    outDays.textContent = '00';
+    outHours.textContent = '00';
+    outMinutes.textContent = '00';
+    outSeconds.textContent = '00';
+  } else {
+    const restOfTime = convertMs(targetDate - currentTime);
+    const { days, hours, minutes, seconds } = restOfTime;
+    outDays.textContent = addLeadingZero(days);
+    outHours.textContent = addLeadingZero(hours);
+    outMinutes.textContent = addLeadingZero(minutes);
+    outSeconds.textContent = addLeadingZero(seconds);
+  }
+}
+
+btnStart.addEventListener('click', startCountdown);
+
+flatpickr('#datetime-picker', options);

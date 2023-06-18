@@ -8,34 +8,40 @@ function createPromise(position, delay) {
     Number(formEl.elements.delay.value) +
     position * Number(formEl.elements.step.value);
   position += 1;
+
   return new Promise((resolve, reject) => {
-    if (shouldResolve) {
-      resolve({ position, delay });
-    } else {
-      reject({ position, delay });
-    }
+    setTimeout(() => {
+      if (shouldResolve) {
+        resolve({ position, delay });
+      } else {
+        reject({ position, delay });
+      }
+    }, delay);
   });
 }
 
 function showResultPromises() {
-  for (let i = 0; i < Number(formEl.elements.amount.value); i += 1) {
-    setTimeout(() => {
-      createPromise(i, Number(formEl.elements.delay.value))
-        .then(({ position, delay }) => {
-          Notify.success(`✅ Fulfilled promise ${position} in ${delay}ms`, {
-            useIcon: false,
-          });
-        })
-        .catch(({ position, delay }) => {
-          Notify.failure(`❌ Rejected promise ${position} in ${delay}ms`, {
-            useIcon: false,
-});
+  const amount = Number(formEl.elements.amount.value);
+  const delay = Number(formEl.elements.delay.value);
+  const step = Number(formEl.elements.step.value);
+
+  for (let i = 0; i < amount; i += 1) {
+    createPromise(i, delay + i * step)
+      .then(({ position, delay }) => {
+        Notify.success(`✅ Fulfilled promise ${position} in ${delay}ms`, {
+          useIcon: false,
         });
-    }, Number(formEl.elements.delay.value) + i * Number(formEl.elements.step.value));
+      })
+      .catch(({ position, delay }) => {
+        Notify.failure(`❌ Rejected promise ${position} in ${delay}ms`, {
+          useIcon: false,
+        });
+      });
   }
 }
 
 formEl.addEventListener('submit', event => {
   event.preventDefault();
   showResultPromises();
+  formEl.reset();
 });
